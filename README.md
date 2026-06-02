@@ -6,6 +6,7 @@ La cartella contiene i codici necessari a simulare la propagazione di fotoni sol
   ### Moduli
   * costanti.py — costanti fisiche fondamentali e parametri atmosferici usati da tutti gli script
   * atmosfera.py — funzioni fisiche della simulazione: distribuzione di Planck, coefficiente di Rayleigh, spessore di massa d'aria e campionamento Monte Carlo
+  * stile_grafici.py — impostazione di stile comune a tutti i grafici
 
   ### Script
 
