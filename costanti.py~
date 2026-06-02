@@ -1,0 +1,48 @@
+import numpy as np
+
+# Costanti fisiche fondamentali
+h   = 6.626e-34   # Costante di Planck (J s)
+c   = 2.998e8     # Velocità della luce (m/s)
+k_b = 1.381e-23   # Costante di Boltzmann (J/K)
+r_t = 6.371e6     # Raggio terrestre (m)
+b_w = 2.898e-3    # Costante di Wien (m K)
+pi  = np.pi
+
+# Parametri atmosferici
+N   = 2.504e25  # Densità molecole atmosfera (m^-3)
+n   = 1.00029   # Indice di rifrazione dell'aria
+s_z = 8000      # Spessore zenitale efficace (m)
+
+# Parametri simulazione
+n_samples = int(5e6)  # Numero di fotoni campionati per simulazione
+
+# Temperatura del Sole
+T_sole = 5750  # (K)
+
+# Dizionario stelle per tramonti esotici
+stelle = {
+    "Sole":             5750,
+    "Proxima Centauri": 2900,
+    "Alkaid":           15500,
+    "v Ori":            33000
+}
+
+colori_stelle = {
+    "Sole":             "goldenrod",
+    "Proxima Centauri": "crimson",
+    "Alkaid":           "royalblue",
+    "v Ori":            "mediumorchid"
+}
+
+# Griglia angolare zenitale (radianti)
+n_angoli    = 20
+angoli      = np.linspace(0, np.pi/2, n_angoli)
+angoli_gradi = np.degrees(angoli)
+
+# Ozono: densità colonnare superficiale
+# 300 Dobson Units, con 1 DU = 2.687e20 molecole/m^2
+# Fonte: https://ozonewatch.gsfc.nasa.gov/facts/dobson_SH.html
+N_O3_col = 300 * 2.69e20  # (molecole/m^2)
+
+# File dati sezione d'urto ozono
+FILE_OZONO = "SCIA_O3_Temp_cross-section_V4.1.DAT"

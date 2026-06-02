@@ -1,0 +1,152 @@
+import numpy as np
+from costanti import h, c, k_b, N, n, s_z, r_t, pi
+
+
+def fotoni_planck(lam, T):
+    """
+    Calcola la densità spettrale di fotoni di corpo nero per unità di
+    lunghezza d'onda, secondo la distribuzione di Planck.
+
+    Parametri:
+        lam (float o np.array): Lunghezza d'onda (m)
+        T   (float):              Temperatura della sorgente (K)
+
+    Returns:
+        float o np.array: Densità di fotoni per unità di lunghezza
+        d'onda B_lambda / E_gamma (fotoni m^-3 s^-1 sr^-1 m^-1)
+    """
+    E_gamma = (h * c) / lam
+    B_lam   = (2 * h * c**2) / (lam**5 * (np.exp(E_gamma / (k_b * T)) - 1))
+    return B_lam / E_gamma
+
+
+def beta_rayleigh(lam):
+    """
+    Calcola il coefficiente di scattering di Rayleigh per l'atmosfera
+    terrestre standard.
+
+    Il coefficiente esprime la probabilità di scattering per unità di
+    lunghezza percorsa e dipende fortemente dalla lunghezza d'onda
+    (proporzionale a lambda^-4), motivo per cui la luce blu è diffusa
+    molto più efficacemente della luce rossa.
+
+    Parametri:
+        lam (float o np.array): Lunghezza d'onda (m)
+
+    Returns:
+        float o np.array: Coefficiente di scattering di Rayleigh (m^-1)
+    """
+    num = 8 * pi**3 * (n**2 - 1)**2
+    den = 3 * lam**4 * N
+    return num / den
+
+
+def massa_aria(theta):
+    """
+    Calcola lo spessore di massa d'aria attraversata da un raggio di luce
+    proveniente dall'angolo zenitale theta, tenendo conto della curvatura
+    terrestre.
+
+    Per angoli zenitali piccoli (sole alto) si approssima a s_z / cos(theta),
+    ma vicino all'orizzonte (theta -> pi/2) la curvatura terrestre diventa
+    importante e il risultato diverge in modo fisicamente realistico.
+
+    Parametri:
+        theta (float o np.array): Angolo zenitale (radianti),
+                                    0 = zenit, pi/2 = orizzonte
+
+    Returns:
+        float o np.array: Spessore di massa d'aria percorsa (m)
+    """
+    cos = np.cos(theta)
+    rad = (r_t * cos)**2 + 2 * r_t * s_z + s_z**2
+    return np.sqrt(rad) - r_t * cos
+
+
+def simula_fotoni(theta, T, n_samples, l_min=10e-9, l_max=2000e-9,
+                  sigma_oz=None, N_oz=0.0):
+    """
+    Simula la propagazione di fotoni di corpo nero attraverso l'atmosfera
+    terrestre con il metodo Monte Carlo hit-or-miss.
+
+    La simulazione si articola in due fasi:
+
+    Fase 1 – Campionamento spettrale (hit-or-miss su Planck):
+        Vengono generati n_samples valori di lunghezza d'onda uniformemente
+        distribuiti in [l_min, l_max]. Ciascun fotone viene accettato con
+        probabilità proporzionale alla distribuzione di Planck normalizzata,
+        ottenendo così un campione distribuito secondo lo spettro del corpo nero.
+
+    Fase 2 – Sopravvivenza atmosferica (hit-or-miss su trasmittanza):
+        Ogni fotone accettato nella fase 1 sopravvive all'attraversamento
+        atmosferico con probabilità exp(-tau), dove tau è la profondità ottica
+        totale che include lo scattering di Rayleigh e, opzionalmente,
+        l'assorbimento dell'ozono.
+
+    Parametri:
+        theta     (float):          Angolo zenitale (radianti)
+        T         (float):          Temperatura della sorgente (K)
+        n_samples (int):            Numero di fotoni da generare nella fase 1
+        l_min     (float):          Limite inferiore del range spettrale (m),
+                                    default 10 nm
+        l_max     (float):          Limite superiore del range spettrale (m),
+                                    default 2000 nm
+        sigma_oz  (callable o None): Funzione sigma_oz(lambda) che restituisce
+                                    la sezione d'urto dell'ozono (m^2) in
+                                    funzione della lunghezza d'onda.
+                                    Se None, l'ozono viene ignorato.
+        N_oz      (float):          Densità colonnare dell'ozono (molecole/m^2),
+                                    usata solo se sigma_oz non è None,
+                                    default 0.0
+
+    Returns:
+        N_iniziale (np.array): Lunghezze d'onda (m) dei fotoni accettati
+                                 dalla distribuzione di Planck (prima
+                                 dell'atmosfera)
+        N_finale   (np.array): Lunghezze d'onda (m) dei fotoni sopravvissuti
+                                 all'attraversamento atmosferico
+    """
+    # Fase 1: campionamento hit-or-miss sulla distribuzione di Planck
+    l_test  = np.random.uniform(l_min, l_max, n_samples)
+    D_test  = fotoni_planck(l_test, T)
+    D_max   = np.max(D_test)
+    y_test  = np.random.uniform(0, D_max, n_samples)
+    mask_pl = y_test < D_test
+    N_iniziale = l_test[mask_pl]
+
+    # Fase 2: sopravvivenza atmosferica
+    S   = massa_aria(theta)
+    tau = beta_rayleigh(N_iniziale) * S
+    if sigma_oz is not None:
+        tau = tau + sigma_oz(N_iniziale) * N_oz
+    prob_soprav = np.exp(-tau)
+    y_soprav    = np.random.random(len(N_iniziale))
+    mask_soprav = y_soprav < prob_soprav
+    N_finale    = N_iniziale[mask_soprav]
+
+    return N_iniziale, N_finale
+
+
+def flusso_integrato(theta, T, n_samples, l_min, l_max):
+    """
+    Calcola il flusso di fotoni integrato in banda che sopravvive
+    all'atmosfera, normalizzato al numero di fotoni incidenti.
+
+    Chiama simula_fotoni e restituisce il rapporto N_finale / N_iniziale,
+    che rappresenta la trasmittanza media dell'atmosfera nell'intervallo
+    spettrale [l_min, l_max] per l'angolo zenitale dato.
+
+    Parametri:
+        theta     (float): Angolo zenitale (radianti)
+        T         (float): Temperatura della sorgente (K)
+        n_samples (int):   Numero di fotoni da campionare
+        l_min     (float): Limite inferiore del range spettrale (m)
+        l_max     (float): Limite superiore del range spettrale (m)
+
+    Returns:
+        float: Frazione di fotoni sopravvissuti N_finale / N_iniziale,
+               compresa tra 0 (nessun fotone sopravvive) e 1 (tutti
+               sopravvivono)
+    """
+    N_iniziale, N_finale = simula_fotoni(theta, T, n_samples, l_min, l_max)
+    return len(N_finale) / len(N_iniziale)
