@@ -8,10 +8,10 @@ Il file dei dati della sezione d'urto dell'ozono deve trovarsi nella stessa
 cartella dello script: SCIA_O3_Temp_cross-section_V4.1.DAT
 
 Produce tre grafici:
-    1. Confronto della distribuzione spettrale al zenit con e senza ozono,
-       evidenziando l'assorbimento UV.
-    2. Sezione d'urto di assorbimento dell'ozono in funzione della lunghezza
+    1. Sezione d'urto di assorbimento dell'ozono in funzione della lunghezza
        d'onda (scala logaritmica).
+    2. Confronto della distribuzione spettrale al zenit con e senza ozono,
+       evidenziando l'assorbimento UV.
     3. Validazione: confronto pannello sinistro (calcolo analitico) e pannello
        destro (Monte Carlo) per le stesse condizioni.
 """
