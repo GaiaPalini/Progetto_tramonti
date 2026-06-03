@@ -5,10 +5,10 @@ Simula come apparirebbe un tramonto su un pianeta con atmosfera terrestre
 ma illuminato da stelle di temperatura diversa dal Sole.
 
 Le stelle simulate sono:
-    - Sole           (T = 5750 K,  nana gialla)
-    - Proxima Centauri (T = 2900 K, nana rossa)
-    - Alkaid         (T = 15500 K, gigante blu-bianca)
-    - v Ori          (T = 33000 K, supergigante blu)
+    - Sole           (T = 5750 K)
+    - Proxima Centauri (T = 2900 K)
+    - Alkaid         (T = 15500 K)
+    - v Ori          (T = 33000 K)
 
 Produce due grafici:
     1. Distribuzione spettrale dei fotoni a zenit e orizzonte per ogni stella
