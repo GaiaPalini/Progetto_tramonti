@@ -30,6 +30,7 @@ La cartella contiene i codici necessari a simulare la propagazione di fotoni sol
 
     Studia l'effetto dell'assorbimento UV da parte dello strato di ozono e valida il metodo Monte Carlo confrontandolo con il calcolo analitico esatto. I dati della sezione d'urto dell'ozono sono presi da misure satellitari SCIAMACHY.
     Fonte dati: https://www.iup.uni-bremen.de/UVSAT_material/data/xsections/SCIA_O3_Temp_cross-section_V4.1.DAT
+    
     Produce tre grafici:
       * Sezione d'urto dell'ozono in funzione della lunghezza d'onda
       * Confronto spettrale con e senza ozono allo zenit
