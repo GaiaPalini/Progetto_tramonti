@@ -5,11 +5,11 @@ prodotti nello script.
 """
 import matplotlib.pyplot as plt
 
-plt.rcParams['axes.labelsize']        = 19
+plt.rcParams['axes.labelsize']        = 20
 plt.rcParams['xtick.labelsize']       = 17
 plt.rcParams['ytick.labelsize']       = 17
 plt.rcParams['legend.fontsize']       = 19
-plt.rcParams['figure.titlesize']      = 15
+plt.rcParams['figure.titlesize']      = 19
 plt.rcParams['xtick.minor.visible']   = True
 plt.rcParams['xtick.direction']       = 'in'
 plt.rcParams['ytick.minor.visible']   = True
@@ -37,3 +37,4 @@ plt.rcParams['legend.frameon']        = False
 plt.rcParams['lines.linewidth']       = 2.5
 plt.rcParams['lines.markersize']      = 15
 plt.rcParams['axes.linewidth']        = 1.6
+plt.rcParams['axes.titlesize']        = 20
