@@ -44,7 +44,7 @@ for i, (nome, T) in enumerate(stelle.items()):
     ax.hist(n_oriz   * 1e9, bins=bins, alpha=0.8, color='orangered',label='Orizzonte')
     ax.set_xlabel('lambda [nm]')
     ax.set_ylabel('Numero di fotoni')
-    ax.set_title(f'{nome} (T = {T} K) - {len(n_0)} fotoni accettati')
+    ax.set_title(f'{nome} (T = {T} K)')
     ax.legend(fontsize=9)
 
 plt.tight_layout()
